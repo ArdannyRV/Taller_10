@@ -1,17 +1,21 @@
 {
   "extends": "expo/tsconfig.base",
-  "compilerOptions": {
-    "strict": true,
-    "paths": {
-      "@/*": [
-        "./*"
-      ]
-    }
-  },
-  "include": [
+    "include": [
     "**/*.ts",
     "**/*.tsx",
     ".expo/types/**/*.ts",
-    "expo-env.d.ts"
-  ]
+    "expo-env.d.ts",
+    "env.d.ts"
+  ],
+  "compilerOptions": {
+    "strict": true,
+    "baseUrl": ".",
+    "lib": ["ESNext"],
+    "ignoreDeprecations": "6.0",
+    "paths": {
+      "@features/*": ["src/features/*"],
+      "@shared/*": ["src/shared/*"],
+    }
+  },
+
 }
