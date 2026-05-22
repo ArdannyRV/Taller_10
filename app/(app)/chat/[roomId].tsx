@@ -1,10 +1,13 @@
+import * as ImagePicker from 'expo-image-picker';
 import { useAuthStore } from "@features/auth/presentation/store/authStore";
 import { Message } from "@features/chat/domain/entities/Message";
 import { useChat } from "@features/chat/presentation/hooks/useChat";
 import { useLocalSearchParams } from "expo-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
+  ActivityIndicator,
   FlatList,
+  Image,
   KeyboardAvoidingView,
   Platform,
   StyleSheet,
@@ -16,7 +19,7 @@ import {
 
 export default function ChatScreen() {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
-  const { messages, sendMessage, isLoading } = useChat(roomId);
+  const { messages, sendMessage, isLoading, uploadImage, isUploading } = useChat(roomId);
   const user = useAuthStore((s) => s.user);
   const [input, setInput] = useState("");
   const listRef = useRef<FlatList>(null);
@@ -27,9 +30,24 @@ export default function ChatScreen() {
 
   const handleSend = useCallback(async () => {
     if (!input.trim()) return;
-    sendMessage(input.trim());
+    sendMessage({ content: input.trim() });
     setInput("");
   }, [input, sendMessage]);
+
+  const handlePickImage = useCallback(async () => {
+    const result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ['images'],
+      quality: 0.7,
+    });
+    if (result.canceled) return;
+    const uri = result.assets[0].uri;
+    uploadImage(uri, {
+      onSuccess: (imageUrl: string) => {
+        sendMessage({ content: input.trim(), imageUrl });
+        setInput("");
+      },
+    });
+  }, [input, uploadImage, sendMessage]);
 
   const renderMsg = ({ item }: { item: Message }) => {
     const isOwn = item.userId === user?.id;
@@ -37,9 +55,18 @@ export default function ChatScreen() {
       <View style={[styles.row, isOwn && styles.rowOwn]}>
         <View style={[styles.bubble, isOwn ? styles.own : styles.other]}>
           {!isOwn && <Text style={styles.author}>{item.authorUsername}</Text>}
-          <Text style={[styles.text, isOwn && styles.textOwn]}>
-            {item.content}
-          </Text>
+          {item.content ? (
+            <Text style={[styles.text, isOwn && styles.textOwn]}>
+              {item.content}
+            </Text>
+          ) : null}
+          {item.imageUrl ? (
+            <Image
+              source={{ uri: item.imageUrl }}
+              style={{ width: 200, height: 200, borderRadius: 8, marginTop: 4 }}
+              resizeMode="cover"
+            />
+          ) : null}
           <Text style={styles.time}>
             {item.createdAt.toLocaleTimeString([], {
               hour: "2-digit",
@@ -65,6 +92,13 @@ export default function ChatScreen() {
         contentContainerStyle={{ padding: 12 }}
       />
       <View style={styles.inputRow}>
+        <TouchableOpacity style={styles.clipBtn} onPress={handlePickImage}>
+          {isUploading ? (
+            <ActivityIndicator size="small" color="#007AFF" />
+          ) : (
+            <Text style={styles.clipIcon}>📎</Text>
+          )}
+        </TouchableOpacity>
         <TextInput
           style={styles.input}
           value={input}
@@ -108,6 +142,14 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     maxHeight: 100,
   },
+  clipBtn: {
+    marginRight: 8,
+    width: 40,
+    height: 40,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+  clipIcon: { fontSize: 22 },
   sendBtn: {
     marginLeft: 8,
     backgroundColor: "#007AFF",

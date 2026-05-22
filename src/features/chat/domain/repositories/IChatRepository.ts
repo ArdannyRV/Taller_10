@@ -4,7 +4,8 @@ export interface IChatRepository {
     getRooms(): Promise<Room[]>;
     createRoom(name: string, userId: string): Promise<Room>;
     getMessages(roomId: string): Promise<Message[]>;
-    sendMessage(roomId: string, userId: string, content: string,): Promise<Message>;
+    sendMessage(roomId: string, userId: string, content: string, imageUrl?: string): Promise<Message>;
+    uploadImage(uri: string, userId: string): Promise<string>;
 
     subscribeToRoom(
         roomId: string,
