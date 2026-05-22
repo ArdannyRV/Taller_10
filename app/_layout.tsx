@@ -1,9 +1,9 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Slot, useRouter, useSegments } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/src/shared/infrastructure/supabase/client';
-import { useAuthStore } from '@/src/features/auth/presentation/store/authStore';
-import { SupabaseAuthRepository } from '@/src/features/auth/infrastructure/repositories/SupabaseAuthRepository';
+import { supabase } from '@shared/infrastructure/supabase/client';
+import { useAuthStore } from '@features/auth/presentation/store/authStore';
+import { SupabaseAuthRepository } from '@features/auth/infrastructure/repositories/SupabaseAuthRepository';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
