@@ -16,6 +16,22 @@ import {
   TouchableOpacity,
   View,
 } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
+
+const COLORS = {
+  primary: '#075E54',
+  secondary: '#25D366',
+  accent: '#128C7E',
+  bgChat: '#ECE5DD',
+  bubbleOwn: '#DCF8C6',
+  bubbleOther: '#FFFFFF',
+  surface: '#FFFFFF',
+  inputBg: '#F0F2F5',
+  textPrimary: '#111B21',
+  textMuted: '#667781',
+  white: '#FFFFFF',
+};
 
 export default function ChatScreen() {
   const { roomId } = useLocalSearchParams<{ roomId: string }>();
@@ -52,18 +68,16 @@ export default function ChatScreen() {
   const renderMsg = ({ item }: { item: Message }) => {
     const isOwn = item.userId === user?.id;
     return (
-      <View style={[styles.row, isOwn && styles.rowOwn]}>
+      <View style={[styles.row, isOwn ? styles.rowOwn : styles.rowOther]}>
         <View style={[styles.bubble, isOwn ? styles.own : styles.other]}>
           {!isOwn && <Text style={styles.author}>{item.authorUsername}</Text>}
           {item.content ? (
-            <Text style={[styles.text, isOwn && styles.textOwn]}>
-              {item.content}
-            </Text>
+            <Text style={styles.text}>{item.content}</Text>
           ) : null}
           {item.imageUrl ? (
             <Image
               source={{ uri: item.imageUrl }}
-              style={{ width: 200, height: 200, borderRadius: 8, marginTop: 4 }}
+              style={styles.image}
               resizeMode="cover"
             />
           ) : null}
@@ -89,75 +103,132 @@ export default function ChatScreen() {
         data={messages}
         keyExtractor={(m) => m.id}
         renderItem={renderMsg}
-        contentContainerStyle={{ padding: 12 }}
+        contentContainerStyle={{ paddingVertical: 12 }}
       />
-      <View style={styles.inputRow}>
-        <TouchableOpacity style={styles.clipBtn} onPress={handlePickImage}>
-          {isUploading ? (
-            <ActivityIndicator size="small" color="#007AFF" />
-          ) : (
-            <Text style={styles.clipIcon}>📎</Text>
-          )}
-        </TouchableOpacity>
-        <TextInput
-          style={styles.input}
-          value={input}
-          onChangeText={setInput}
-          placeholder="Escribe..."
-          multiline
-          maxLength={500}
-        />
-        <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
-          <Text style={styles.sendIcon}>➤</Text>
-        </TouchableOpacity>
+      <View style={styles.inputBar}>
+        <View style={styles.inputRow}>
+          <TouchableOpacity style={styles.clipBtn} onPress={handlePickImage}>
+            {isUploading ? (
+              <ActivityIndicator size="small" color={COLORS.secondary} />
+            ) : (
+              <Ionicons name="attach" size={22} color={COLORS.primary} />
+            )}
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input}
+            value={input}
+            onChangeText={setInput}
+            placeholder="Escribe un mensaje..."
+            placeholderTextColor={COLORS.textMuted}
+            multiline
+            maxLength={500}
+          />
+          <TouchableOpacity style={styles.sendBtn} onPress={handleSend}>
+            <LinearGradient colors={['#25D366', '#128C7E']} style={styles.sendGrad}>
+              <Ionicons name="send" size={18} color="white" />
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#f5f5f5" },
-  row: { flexDirection: "row", marginVertical: 4 },
-  rowOwn: { justifyContent: "flex-end" },
-  bubble: { maxWidth: "75%", borderRadius: 12, padding: 10 },
-  own: { backgroundColor: "#007AFF" },
-  other: { backgroundColor: "#fff", borderWidth: 1, borderColor: "#e0e0e0" },
-  author: { fontSize: 11, fontWeight: "600", color: "#555", marginBottom: 2 },
-  text: { fontSize: 15, color: "#000" },
-  textOwn: { color: "#fff" },
-  time: { fontSize: 10, color: "#aaa", marginTop: 4, alignSelf: "flex-end" },
+  container: { flex: 1, backgroundColor: COLORS.bgChat },
+  row: {
+    marginVertical: 3,
+    paddingHorizontal: 12,
+    flexDirection: 'row',
+  },
+  rowOwn: { justifyContent: 'flex-end' },
+  rowOther: { justifyContent: 'flex-start' },
+  bubble: {
+    maxWidth: '75%',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    shadowColor: '#000',
+    shadowOpacity: 0.06,
+    shadowRadius: 2,
+    elevation: 1,
+  },
+  own: {
+    backgroundColor: COLORS.bubbleOwn,
+    borderRadius: 16,
+    borderBottomRightRadius: 2,
+  },
+  other: {
+    backgroundColor: COLORS.bubbleOther,
+    borderRadius: 16,
+    borderBottomLeftRadius: 2,
+  },
+  author: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: COLORS.secondary,
+    marginBottom: 2,
+  },
+  text: {
+    fontSize: 15,
+    color: COLORS.textPrimary,
+    lineHeight: 20,
+  },
+  image: {
+    borderRadius: 10,
+    marginTop: 6,
+    width: 220,
+    height: 220,
+  },
+  time: {
+    fontSize: 10,
+    color: COLORS.textMuted,
+    textAlign: 'right',
+    marginTop: 4,
+  },
+  inputBar: {
+    backgroundColor: COLORS.surface,
+    paddingHorizontal: 8,
+    paddingVertical: 8,
+    paddingBottom: Platform.OS === 'ios' ? 20 : 8,
+    borderTopWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.06,
+    shadowRadius: 4,
+    elevation: 8,
+  },
   inputRow: {
-    flexDirection: "row",
-    padding: 8,
-    backgroundColor: "#fff",
-    borderTopWidth: 1,
-    borderColor: "#e0e0e0",
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: 8,
+  },
+  clipBtn: {
+    width: 42,
+    height: 42,
+    borderRadius: 21,
+    backgroundColor: COLORS.inputBg,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   input: {
     flex: 1,
-    borderWidth: 1,
-    borderColor: "#ccc",
-    borderRadius: 20,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 22,
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    fontSize: 15,
+    color: COLORS.textPrimary,
     maxHeight: 100,
   },
-  clipBtn: {
-    marginRight: 8,
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  clipIcon: { fontSize: 22 },
   sendBtn: {
-    marginLeft: 8,
-    backgroundColor: "#007AFF",
-    borderRadius: 20,
-    width: 40,
-    height: 40,
-    justifyContent: "center",
-    alignItems: "center",
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    overflow: 'hidden',
   },
-  sendIcon: { color: "#fff", fontSize: 16 },
+  sendGrad: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
 });

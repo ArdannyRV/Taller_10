@@ -1,6 +1,8 @@
 import { useAuth } from "@features/auth/presentation/hooks/useAuth";
 import { Stack } from "expo-router";
-import { Text, TouchableOpacity } from "react-native";
+import { TouchableOpacity } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { LinearGradient } from "expo-linear-gradient";
 
 export default function AppLayout() {
   const { logout } = useAuth();
@@ -8,18 +10,20 @@ export default function AppLayout() {
   return (
     <Stack
       screenOptions={{
-        headerStyle: { backgroundColor: "#007AFF" },
-        headerTintColor: "#fff",
-        headerTitleStyle: { fontWeight: "bold" },
+        headerBackground: () => (
+          <LinearGradient colors={['#075E54', '#128C7E']} style={{ flex: 1 }} />
+        ),
+        headerTintColor: '#FFFFFF',
+        headerTitleStyle: { fontWeight: '800', fontSize: 18 },
       }}
     >
       <Stack.Screen
         name="index"
         options={{
-          title: "Salas de Chat",
+          title: 'Mi Chat',
           headerRight: () => (
             <TouchableOpacity onPress={logout} style={{ marginRight: 4 }}>
-              <Text style={{ color: "#fff", fontSize: 14 }}>Salir</Text>
+              <Ionicons name="log-out-outline" size={24} color="white" />
             </TouchableOpacity>
           ),
         }}
