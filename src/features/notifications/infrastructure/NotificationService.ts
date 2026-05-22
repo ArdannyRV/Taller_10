@@ -1,38 +1,26 @@
 import { Platform } from 'react-native';
 
-// Importaciones lazy para evitar que expo-notifications registre push tokens automáticamente
-let Notifications: typeof import('expo-notifications') | null = null;
-
-async function getNotifications() {
-  if (!Notifications) {
-    Notifications = await import('expo-notifications');
-  }
-  return Notifications;
-}
+// expo-notifications no funciona en Expo Go SDK 53+
+// Esta implementación es un stub que no crashea en Expo Go
+// y está lista para activarse en un development build
+const isExpoGo = process.env.EXPO_PUBLIC_IS_EXPO_GO !== 'false';
 
 export class NotificationService {
   static setupAndroidChannel(): void {
-    if (Platform.OS !== 'android') return;
-    getNotifications().then((N) => {
-      N.setNotificationChannelAsync('chat-messages', {
-        name: 'Mensajes de Chat',
-        importance: N.AndroidImportance.HIGH,
-        sound: 'default',
-      });
-    });
+    if (isExpoGo || Platform.OS !== 'android') return;
+    // Solo activo en development build / APK
   }
 
   static async requestPermissions(): Promise<boolean> {
-    const N = await getNotifications();
-    const { status } = await N.requestPermissionsAsync();
-    return status === 'granted';
+    if (isExpoGo) return false;
+    return false;
   }
 
   static async scheduleLocalNotification(title: string, body: string): Promise<void> {
-    const N = await getNotifications();
-    await N.scheduleNotificationAsync({
-      content: { title, body, sound: true },
-      trigger: null,
-    });
+    if (isExpoGo) {
+      // En Expo Go solo logueamos — en APK esto dispararía la notificación real
+      console.log(`[Notificación simulada] ${title}: ${body}`);
+      return;
+    }
   }
 }

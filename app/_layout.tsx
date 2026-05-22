@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@shared/infrastructure/supabase/client';
 import { useAuthStore } from '@features/auth/presentation/store/authStore';
 import { SupabaseAuthRepository } from '@features/auth/infrastructure/repositories/SupabaseAuthRepository';
-import { NotificationService } from '@features/notifications/infrastructure/NotificationService';
 
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
@@ -19,9 +18,6 @@ function AuthGuard() {
   const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
-    NotificationService.setupAndroidChannel();
-    NotificationService.requestPermissions();
-
     authRepo.getCurrentUser().then((u) => {
       setUser(u);
       setIsReady(true);

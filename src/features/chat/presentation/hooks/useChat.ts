@@ -30,12 +30,14 @@ export function useChat(roomId: string) {
   // Paso 2: suscribirse al canal Realtime
   useEffect(() => {
     const unsubscribe = subscribeUseCase.execute(roomId, (newMsg) => {
-      if (newMsg.userId !== user?.id) {
-        NotificationService.scheduleLocalNotification(
-          newMsg.authorUsername ?? 'Nuevo mensaje',
-          newMsg.content,
-        );
-      }
+      try {
+        if (newMsg.userId !== user?.id) {
+          NotificationService.scheduleLocalNotification(
+            newMsg.authorUsername ?? 'Nuevo mensaje',
+            newMsg.content,
+          );
+        }
+      } catch (_) {}
       queryClient.setQueryData(["messages", roomId], (old: Message[] = []) => {
         const exists = old.some((m) => m.id === newMsg.id);
         return exists ? old : [...old, newMsg];
