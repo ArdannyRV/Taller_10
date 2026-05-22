@@ -85,6 +85,12 @@ export function useChat(roomId: string) {
 
   const uploadImageMutation = useMutation({
     mutationFn: (uri: string) => uploadImageUseCase.execute(uri, user!.id),
+    onSuccess: (imageUrl: string) => {
+      sendMutation.mutate({ content: '', imageUrl });
+    },
+    onError: (error) => {
+      console.error('Error al subir imagen:', error);
+    },
   });
 
   return {
@@ -92,7 +98,7 @@ export function useChat(roomId: string) {
     sendMessage: sendMutation.mutate,
     isLoading,
     isSending: sendMutation.isPending,
-    uploadImage: uploadImageMutation.mutate,
+    uploadImage: (uri: string) => uploadImageMutation.mutate(uri),
     isUploading: uploadImageMutation.isPending,
   };
 }

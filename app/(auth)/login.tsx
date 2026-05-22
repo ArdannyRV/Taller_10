@@ -16,17 +16,23 @@ import { LinearGradient } from "expo-linear-gradient";
 import { Ionicons } from "@expo/vector-icons";
 
 const COLORS = {
-  primary: '#075E54',
-  secondary: '#25D366',
-  accent: '#128C7E',
-  bgChat: '#ECE5DD',
-  bubbleOwn: '#DCF8C6',
-  bubbleOther: '#FFFFFF',
-  surface: '#FFFFFF',
-  inputBg: '#F0F2F5',
-  textPrimary: '#111B21',
-  textMuted: '#667781',
-  white: '#FFFFFF',
+  bg:           '#0C0C0C',
+  surface:      '#141414',
+  card:         '#1A1A2E',
+  primary:      '#7C3AED',
+  primaryLight: '#A855F7',
+  accent:       '#C084FC',
+  gradStart:    '#18011F',
+  gradMid:      '#7621B0',
+  gradEnd:      '#4C1D95',
+  bubbleOwn:    '#2D1B69',
+  bubbleOther:  '#1C1C2E',
+  textPrimary:  '#F5F0FF',
+  textMuted:    '#9CA3AF',
+  textAccent:   '#C084FC',
+  border:       'rgba(124,58,237,0.3)',
+  inputBg:      '#1E1E3A',
+  white:        '#FAF5FF',
 };
 
 export default function LoginScreen() {
@@ -40,9 +46,11 @@ export default function LoginScreen() {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <LinearGradient colors={['#075E54', '#128C7E']} style={styles.header}>
-          <Ionicons name="chatbubbles" size={72} color="white" />
-          <Text style={styles.headerTitle}>Mi Chat</Text>
+        <LinearGradient colors={['#18011F', '#7621B0', '#4C1D95']} style={styles.header}>
+          <View style={styles.headerIconWrap}>
+            <Ionicons name="chatbubbles" size={44} color={COLORS.accent} />
+          </View>
+          <Text style={styles.headerTitle}>MI CHAT</Text>
           <Text style={styles.headerSub}>Conecta con todos</Text>
         </LinearGradient>
 
@@ -51,7 +59,7 @@ export default function LoginScreen() {
           <Text style={styles.bodySub}>Bienvenido de vuelta</Text>
 
           <View style={styles.inputWrap}>
-            <Ionicons name="mail-outline" size={20} color={COLORS.textMuted} />
+            <Ionicons name="mail-outline" size={20} color={COLORS.accent} />
             <TextInput
               style={styles.input}
               placeholder="Correo"
@@ -64,7 +72,7 @@ export default function LoginScreen() {
           </View>
 
           <View style={styles.inputWrap}>
-            <Ionicons name="lock-closed-outline" size={20} color={COLORS.textMuted} />
+            <Ionicons name="lock-closed-outline" size={20} color={COLORS.accent} />
             <TextInput
               style={styles.input}
               placeholder="Contraseña"
@@ -77,28 +85,29 @@ export default function LoginScreen() {
 
           {error && (
             <View style={styles.errorBox}>
-              <Ionicons name="alert-circle" color="#E53935" size={16} />
+              <Ionicons name="alert-circle" color={COLORS.accent} size={16} />
               <Text style={styles.errorText}>{error}</Text>
             </View>
           )}
 
-          <View style={styles.btnWrap}>
-            <LinearGradient colors={['#25D366', '#128C7E']} style={styles.btnGrad}>
-              <TouchableOpacity
-                style={StyleSheet.absoluteFill}
-                onPress={() => login({ email, password })}
-                disabled={isLoading}
-              >
-                <View style={styles.btnInner}>
-                  {isLoading ? (
-                    <ActivityIndicator color="white" />
-                  ) : (
-                    <Text style={styles.btnText}>Ingresar</Text>
-                  )}
-                </View>
-              </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.btnWrap}
+            onPress={() => login({ email, password })}
+            disabled={isLoading}
+          >
+            <LinearGradient
+              colors={['#18011F', '#7621B0', '#4C1D95', '#A855F7']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.btnGrad}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={COLORS.white} />
+              ) : (
+                <Text style={styles.btnText}>Ingresar</Text>
+              )}
             </LinearGradient>
-          </View>
+          </TouchableOpacity>
 
           <View style={styles.linkRow}>
             <Text style={styles.linkText}>¿No tienes cuenta? </Text>
@@ -111,76 +120,91 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: COLORS.surface },
+  safe: { flex: 1, backgroundColor: COLORS.bg },
   flex: { flex: 1 },
   header: {
-    height: 220,
+    height: 240,
+    justifyContent: 'center',
+    alignItems: 'center',
+    gap: 12,
+  },
+  headerIconWrap: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: 'rgba(124,58,237,0.2)',
+    borderWidth: 1,
+    borderColor: COLORS.accent,
     justifyContent: 'center',
     alignItems: 'center',
   },
   headerTitle: {
     color: COLORS.white,
-    fontSize: 32,
+    fontSize: 34,
     fontWeight: '800',
-    marginTop: 8,
+    letterSpacing: 4,
+    textTransform: 'uppercase',
   },
   headerSub: {
-    color: 'rgba(255,255,255,0.8)',
-    fontSize: 14,
-    marginTop: 4,
+    color: 'rgba(192,132,252,0.7)',
+    fontSize: 13,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   body: {
     padding: 32,
-    gap: 16,
+    gap: 20,
   },
   bodyTitle: {
-    fontSize: 24,
+    fontSize: 22,
     fontWeight: '700',
     color: COLORS.textPrimary,
+    letterSpacing: 2,
+    textTransform: 'uppercase',
   },
   bodySub: {
-    fontSize: 14,
+    fontSize: 13,
     color: COLORS.textMuted,
+    letterSpacing: 1,
     marginBottom: 8,
   },
   inputWrap: {
+    backgroundColor: COLORS.inputBg,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: COLORS.inputBg,
-    borderRadius: 14,
     paddingHorizontal: 16,
-    height: 54,
+    height: 56,
   },
   input: {
     flex: 1,
-    marginLeft: 10,
+    marginLeft: 12,
     fontSize: 15,
     color: COLORS.textPrimary,
   },
   errorBox: {
+    backgroundColor: 'rgba(124,58,237,0.15)',
+    borderRadius: 12,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: COLORS.primary,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FFF3F3',
-    borderRadius: 10,
-    padding: 12,
     gap: 8,
   },
   errorText: {
-    color: '#E53935',
-    fontSize: 14,
+    color: COLORS.accent,
+    fontSize: 13,
     flex: 1,
   },
   btnWrap: {
-    borderRadius: 14,
-    height: 54,
+    height: 56,
+    borderRadius: 16,
     overflow: 'hidden',
   },
   btnGrad: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  btnInner: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
@@ -189,6 +213,8 @@ const styles = StyleSheet.create({
     color: COLORS.white,
     fontWeight: '700',
     fontSize: 16,
+    letterSpacing: 3,
+    textTransform: 'uppercase',
   },
   linkRow: {
     flexDirection: 'row',
@@ -197,11 +223,11 @@ const styles = StyleSheet.create({
   },
   linkText: {
     color: COLORS.textMuted,
-    fontSize: 14,
+    fontSize: 13,
   },
   linkAction: {
-    color: COLORS.secondary,
+    color: COLORS.accent,
     fontWeight: '600',
-    fontSize: 14,
+    fontSize: 13,
   },
 });
